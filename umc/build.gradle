@@ -44,6 +44,10 @@ dependencies {
 	implementation 'org.springdoc:springdoc-openapi-ui:1.6.15'
 	implementation 'io.springfox:springfox-swagger2:2.9.2'
 	implementation 'io.springfox:springfox-swagger-ui:2.9.2'
+
+	implementation "org.hibernate.orm:hibernate-core:6.5.2.Final"
+	implementation 'org.postgresql:postgresql:42.6.0'
+
 }
 
 tasks.named('bootBuildImage') {
