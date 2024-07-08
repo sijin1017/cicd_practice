@@ -36,9 +36,14 @@ jobs:
       - name: Log in to DockerHub
         run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
 
+      - name: Set lowercase Docker username
+        id: set_lowercase_docker_username
+        run: echo "LOWERCASE_DOCKER_USERNAME=$(echo '${{ secrets.DOCKER_USERNAME }}' | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
+
       - name: Docker build & push to prod
+        env:
+          LOWERCASE_DOCKER_USERNAME: ${{ env.LOWERCASE_DOCKER_USERNAME }}
         run: |
-          LOWERCASE_DOCKER_USERNAME=$(echo "${{ secrets.DOCKER_USERNAME }}" | tr '[:upper:]' '[:lower:]')
           docker build -f Dockerfile -t $LOWERCASE_DOCKER_USERNAME/docker-test-prod:latest .
           docker push $LOWERCASE_DOCKER_USERNAME/docker-test-prod:latest
 
@@ -53,7 +58,6 @@ jobs:
           script: |
             whoami
             sudo docker ps
-            LOWERCASE_DOCKER_USERNAME=$(echo "${{ secrets.DOCKER_USERNAME }}" | tr '[:upper:]' '[:lower:]')
-            sudo docker pull $LOWERCASE_DOCKER_USERNAME/docker-test-prod:latest
-            sudo docker run -d -p 8080:8080 $LOWERCASE_DOCKER_USERNAME/docker-test-prod:latest
+            sudo docker pull ${{ env.LOWERCASE_DOCKER_USERNAME }}/docker-test-prod:latest
+            sudo docker run -d -p 8080:8080 ${{ env.LOWERCASE_DOCKER_USERNAME }}/docker-test-prod:latest
             sudo docker image prune -f
